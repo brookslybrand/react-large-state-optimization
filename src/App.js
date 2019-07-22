@@ -1,80 +1,65 @@
-import React, { useReducer } from 'react'
+import React, { useState } from 'react'
+import { Router, navigate } from '@reach/router'
 
-import ExpansionPanels from './ExpansionPanels'
+import { AppBar as MuiAppBar, Tabs, Tab } from '@material-ui/core'
+import SlowApp from './SlowApp'
 
-const N = 100
-const initalState = Array.from({ length: N }).map((_, i) => ({
-  id: i,
-  firstName: 'placeholder first name',
-  lastName: 'placeholder last name',
-  email: 'email@example.com'
-}))
+import { SLOW_APP_ROUTE } from './constants/routes'
 
-const reducer = (state, action) => {
-  const handleUpdateState = updateState(state)
-  switch (action.type) {
-    case setFirstName().type:
-      return handleUpdateState(action.id, 'firstName', action.firstName)
-
-    case setLastName().type:
-      return handleUpdateState(action.id, 'lastName', action.lastName)
-    case setEmail().type:
-      return handleUpdateState(action.id, 'email', action.email)
-
-    default:
-      return state
-  }
-}
-
-const updateState = items => (idToFind, attr = '', value = '') => {
-  const itemIndex = items.findIndex(({ id }) => id === idToFind)
-  // if item was not found, don't alter the state
-  if (itemIndex === -1) return items
-  const itemsCopy = [...items]
-  const newItem = { ...items[itemIndex], [attr]: value }
-  itemsCopy.splice(itemIndex, 1, newItem)
-  return itemsCopy
-}
-
-const setFirstName = (id = null, firstName = '') => ({
-  type: 'SET_FIRST_NAME',
-  id,
-  firstName
-})
-
-const setLastName = (id = null, lastName = '') => ({
-  type: 'SET_LAST_NAME',
-  id,
-  lastName
-})
-
-const setEmail = (id = null, email = '') => ({
-  type: 'SET_EMAIL',
-  id,
-  email
-})
-
-const App = () => {
-  const [state, dispatch] = useReducer(reducer, initalState)
-
-  const handleSetFirstName = (id, firstName) =>
-    dispatch(setFirstName(id, firstName))
-
-  const handleSetLastName = (id, lastName) =>
-    dispatch(setLastName(id, lastName))
-
-  const handleSetEmail = (id, email) => dispatch(setEmail(id, email))
-  return (
-    <div style={{ width: '50%', margin: '0 auto' }}>
+const App = () => (
+  <div>
+    <div>
+      {/* taken from https://material-ui.com/components/tabs/#simple-tabs */}
+      <AppBar />
       <h1>Optimizing a React App</h1>
-      <ExpansionPanels
-        items={state}
-        setFirstName={handleSetFirstName}
-        setLastName={handleSetLastName}
-        setEmail={handleSetEmail}
-      />
+      <Router primary={false}>
+        {tabObjects.map(({ title, route, RouteComponent }) => (
+          <RouteComponent key={title} path={route} />
+        ))}
+      </Router>
     </div>
+  </div>
+)
+
+const tabObjects = [
+  {
+    title: 'Slow App',
+    route: SLOW_APP_ROUTE,
+    RouteComponent: () => <SlowApp />
+  }
+]
+
+const AppBar = () => {
+  const [value, setValue] = useState(0)
+
+  function handleChange(event, newValue) {
+    setValue(newValue)
+    navigate(`/${tabObjects[newValue].route}`)
+    window.scrollTo(0, 0)
+  }
+
+  return (
+    <MuiAppBar position="static">
+      <Tabs
+        value={value}
+        onChange={handleChange}
+        aria-label="Different implementations of the same app"
+      >
+        {tabObjects.map(({ title }) => (
+          <Tab
+            key={title}
+            label={title}
+            {...a11yProps(tabObjects[0].title.toLowerCase().replace(' ', '-'))}
+          />
+        ))}
+      </Tabs>
+    </MuiAppBar>
   )
 }
+
+const a11yProps = title => ({
+  id: `${title}-implementation-tab`,
+  'aria-controls': `${title}-implementation-tabpanel`
+})
 
 export default App
