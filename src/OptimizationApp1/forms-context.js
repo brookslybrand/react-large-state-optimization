@@ -1,27 +1,34 @@
-import React, { useReducer } from 'react'
+import React, { createContext, useReducer, useContext } from 'react'
 
-import ExpansionPanels from './ExpansionPanels'
+const FormsStateContext = createContext()
+const FormsDispatchContext = createContext()
 
-const SlowApp = () => {
-  const [forms, dispatch] = useReducer(reducer, initalState)
+const FormsStateProvider = ({ children }) => {
+  const [forms, formsDispatch] = useReducer(reducer, initalState)
 
-  const handleSetFirstName = (id, firstName) =>
-    dispatch(setFirstName(id, firstName))
-
-  const handleSetLastName = (id, lastName) =>
-    dispatch(setLastName(id, lastName))
-
-  const handleSetEmail = (id, email) => dispatch(setEmail(id, email))
   return (
-    <div style={{ width: '50%', margin: '0 auto' }}>
-      <ExpansionPanels
-        forms={forms}
-        setFirstName={handleSetFirstName}
-        setLastName={handleSetLastName}
-        setEmail={handleSetEmail}
-      />
-    </div>
+    <FormsStateContext.Provider value={forms}>
+      <FormsDispatchContext.Provider value={formsDispatch}>
+        {children}
+      </FormsDispatchContext.Provider>
+    </FormsStateContext.Provider>
   )
+}
+
+const useFormsState = () => {
+  const forms = useContext(FormsStateContext)
+  if (forms === undefined) {
+    throw new Error('useFormsState must be called within FormsStateProvider')
+  }
+  return forms
+}
+
+const useFormsDispatch = () => {
+  const formsDispatch = useContext(FormsDispatchContext)
+  if (formsDispatch === undefined) {
+    throw new Error('useFormsDispatch must be called within FormsStateProvider')
+  }
+  return formsDispatch
 }
 
 const N = 100
@@ -76,4 +83,11 @@ const setEmail = (id = null, email = '') => ({
   email
 })
 
-export default SlowApp
+export {
+  FormsStateProvider,
+  useFormsState,
+  useFormsDispatch,
+  setFirstName,
+  setLastName,
+  setEmail
+}

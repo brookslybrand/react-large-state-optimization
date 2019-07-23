@@ -8,9 +8,9 @@ import {
 } from '@material-ui/core'
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore'
 
-const ExpansionPanels = ({ items, ...handlers }) => {
-  return items.map(item => (
-    <CustomExpansionPanel key={item.id} {...item} {...handlers} />
+const ExpansionPanels = ({ forms, ...handlers }) => {
+  return forms.map(form => (
+    <CustomExpansionPanel key={form.id} {...form} {...handlers} />
   ))
 }
 
