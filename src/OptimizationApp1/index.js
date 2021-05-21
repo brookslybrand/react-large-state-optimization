@@ -1,15 +1,15 @@
-import React from 'react'
+import React from "react";
 
-import ExpansionPanels from './ExpansionPanels'
+import Accordions from "./Accordions";
 
-import { FormsStateProvider } from './forms-context'
+import { FormsStateProvider } from "./forms-context";
 
 const OptimizationApp1 = () => (
   <FormsStateProvider>
-    <div style={{ width: '50%', margin: '0 auto' }}>
-      <ExpansionPanels />
+    <div style={{ width: "50%", margin: "0 auto" }}>
+      <Accordions />
     </div>
   </FormsStateProvider>
-)
+);
 
-export default OptimizationApp1
+export default OptimizationApp1;
